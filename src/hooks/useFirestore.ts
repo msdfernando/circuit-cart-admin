@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { collection, onSnapshot, query, DocumentData } from 'firebase/firestore';
+import { collection, onSnapshot, query, DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 export function useFirestore<T extends DocumentData>(collectionName: string) {
@@ -9,10 +9,10 @@ export function useFirestore<T extends DocumentData>(collectionName: string) {
   useEffect(() => {
     const q = query(collection(db, collectionName));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const items = snapshot.docs.map((doc) => ({
+      const items = snapshot.docs.map((doc: QueryDocumentSnapshot) => ({
         id: doc.id,
         ...doc.data()
-      })) as T[];
+      })) as unknown as T[];
       setData(items);
       setLoading(false);
     });

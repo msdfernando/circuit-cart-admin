@@ -13,7 +13,7 @@ interface Bill {
 }
 
 export default function BillsPage() {
-  const { data: bills, loading } = useFirestore<Bill>('bills');
+    const { data: bills, loading } = useFirestore<Bill>('bills');
 
   if (loading) return <div>Loading...</div>;
 
