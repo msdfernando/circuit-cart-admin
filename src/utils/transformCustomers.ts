@@ -1,13 +1,12 @@
-// src/utils/transformCustomers.ts
 import { FirebaseCustomer, AppCustomer } from '@/types';
 
-export function transformCustomer(c: FirebaseCustomer): AppCustomer {
+export function transformCustomer(customer: FirebaseCustomer): AppCustomer {
   return {
-    id: c.id,
-    name: c.name || 'Unknown',
-    email: c.email || 'No email',
-    mobile: c.mobile || 'Not provided',
-    gender: c.gender || 'Not specified',
-    points: c.points || 0
+    id: customer.id,
+    name: customer.name || 'Unknown',
+    email: customer.email || 'No email',
+    mobile: customer.mobile || 'Not provided',
+    gender: customer.gender || 'Not specified',
+    points: customer.points || 0
   };
 }

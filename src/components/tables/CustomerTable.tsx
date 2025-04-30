@@ -1,10 +1,10 @@
 import { AppCustomer } from '@/types';
 
-interface CustomerTableProps {
+interface Props {
   customers: AppCustomer[]; // Use the strict type here
 }
 
-export default function CustomerTable({ customers }: CustomerTableProps) {
+export default function CustomerTable({ customers }: Props) {
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
