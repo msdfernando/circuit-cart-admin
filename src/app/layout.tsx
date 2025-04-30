@@ -1,13 +1,4 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
-
-const inter = Inter({ subsets: ['latin'] })
-
-export const metadata: Metadata = {
-  title: 'Circuit Cart Admin',
-  description: 'Admin panel for Circuit Cart',
-}
+import Sidebar from '@/components/Sidebar';
 
 export default function RootLayout({
   children,
@@ -16,7 +7,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className="flex h-screen">
+        <Sidebar />
+        <main className="flex-1 p-6 overflow-auto">
+          {children}
+        </main>
+      </body>
     </html>
-  )
+  );
 }
