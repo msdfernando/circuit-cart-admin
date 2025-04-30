@@ -1,33 +1,23 @@
-import CustomerTable from '@/components/tables/CustomerTable'
+'use client';
+import { useFirestore } from '@/hooks/useFirestore';
+import CustomerTable from '@/components/tables/CustomerTable';
 
-const dummyCustomers = [
-  // Add all customers from your PDF
-  {
-    id: "1",
-    name: "Erebt Mercy",
-    customerId: "370300",
-    email: "michaelle.rivers@example.com",
-    mobile: "+84000000000",
-    gender: "Female",
-    points: 120
-  },
-  // ... other customers
-]
+interface Customer {
+  id: string;
+  name: string;
+  email: string;
+  points: number;
+}
 
 export default function CustomersPage() {
+  const { data: customers, loading } = useFirestore<Customer>('customers');
+
+  if (loading) return <div>Loading...</div>;
+
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Add Customer</h1>
-      
-      <div className="mb-6">
-        <input 
-          type="text" 
-          placeholder="Search for a customer by name or email" 
-          className="w-full p-2 border rounded"
-        />
-      </div>
-
-      <CustomerTable customers={dummyCustomers} />
+      <h1 className="text-3xl font-bold mb-6">Customers</h1>
+      <CustomerTable customers={customers} />
     </div>
-  )
+  );
 }
