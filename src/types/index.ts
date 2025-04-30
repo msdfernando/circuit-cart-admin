@@ -6,3 +6,14 @@ export interface Customer {
     gender: string;
     points: number;
   }
+  
+  export interface Bill {
+    id: string;
+    customerId: string;
+    total: number;
+    items: Array<{
+      productId: string;
+      quantity: number;
+    }>;
+    date?: string; // Optional field
+  }
