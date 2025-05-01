@@ -1,12 +1,16 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { addDoc, collection } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage } from '@/lib/firebase';
 import './styles.css';
 
 export default function AddCustomerPage() {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     fullName: '',
     gender: '',
@@ -16,34 +20,74 @@ export default function AddCustomerPage() {
     email: '',
     phone: '',
     nic: '',
-    points: '',
-    picture: null as File | null
+    points: '0',
+    pictureUrl: ''
   });
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+    
+    if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
+    if (!formData.gender) newErrors.gender = 'Gender is required';
+    if (!formData.birthYear || !formData.birthMonth || !formData.birthDate) {
+      newErrors.birthday = 'Complete birthday is required';
+    }
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+      newErrors.email = 'Email is invalid';
+    }
+    if (!formData.phone) newErrors.phone = 'Phone number is required';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) {
+      const file = e.target.files[0];
+      try {
+        setIsSubmitting(true);
+        const storageRef = ref(storage, `customers/${file.name}`);
+        const snapshot = await uploadBytes(storageRef, file);
+        const downloadUrl = await getDownloadURL(snapshot.ref);
+        setFormData({...formData, pictureUrl: downloadUrl});
+      } catch (error) {
+        console.error('Error uploading file:', error);
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateForm()) return;
+
     try {
+      setIsSubmitting(true);
       await addDoc(collection(db, 'customers'), {
-        fullName: formData.fullName,
+        fullName: formData.fullName.trim(),
         gender: formData.gender,
         birthday: `${formData.birthYear}-${formData.birthMonth}-${formData.birthDate}`,
-        email: formData.email,
-        phone: formData.phone,
-        nic: formData.nic,
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        nic: formData.nic.trim(),
         points: Number(formData.points),
-        createdAt: new Date()
+        pictureUrl: formData.pictureUrl,
+        createdAt: new Date(),
+        updatedAt: new Date()
       });
       router.push('/customers');
     } catch (error) {
       console.error('Error adding customer:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormData({...formData, picture: e.target.files[0]});
-    }
-  };
+  const triggerFileInput = () => fileInputRef.current?.click();
+  const removePicture = () => setFormData({...formData, pictureUrl: ''});
 
   return (
     <div className="customer-add-container">
@@ -57,9 +101,9 @@ export default function AddCustomerPage() {
             type="text"
             value={formData.fullName}
             onChange={(e) => setFormData({...formData, fullName: e.target.value})}
-            className="full-name-input"
-            required
+            className={`full-name-input ${errors.fullName ? 'input-error' : ''}`}
           />
+          {errors.fullName && <span className="error-message">{errors.fullName}</span>}
         </div>
 
         {/* Gender */}
@@ -68,13 +112,14 @@ export default function AddCustomerPage() {
           <select
             value={formData.gender}
             onChange={(e) => setFormData({...formData, gender: e.target.value})}
-            className="gender-select"
+            className={`gender-select ${errors.gender ? 'input-error' : ''}`}
           >
             <option value="" disabled>Gender ▼</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
             <option value="Other">Other</option>
           </select>
+          {errors.gender && <span className="error-message">{errors.gender}</span>}
         </div>
 
         {/* Birthday */}
@@ -84,36 +129,37 @@ export default function AddCustomerPage() {
             <select
               value={formData.birthYear}
               onChange={(e) => setFormData({...formData, birthYear: e.target.value})}
-              className="birthday-select"
+              className={`birthday-select ${errors.birthday ? 'input-error' : ''}`}
             >
               <option value="" disabled>Year ▼</option>
               {Array.from({length: 100}, (_, i) => new Date().getFullYear() - i).map(year => (
-                <option key={year} value={year}>{year}</option>
+                <option key={year} value={String(year).padStart(4, '0')}>{year}</option>
               ))}
             </select>
             
             <select
               value={formData.birthMonth}
               onChange={(e) => setFormData({...formData, birthMonth: e.target.value})}
-              className="birthday-select"
+              className={`birthday-select ${errors.birthday ? 'input-error' : ''}`}
             >
               <option value="" disabled>Month ▼</option>
               {Array.from({length: 12}, (_, i) => i + 1).map(month => (
-                <option key={month} value={month}>{month}</option>
+                <option key={month} value={String(month).padStart(2, '0')}>{month}</option>
               ))}
             </select>
             
             <select
               value={formData.birthDate}
               onChange={(e) => setFormData({...formData, birthDate: e.target.value})}
-              className="birthday-select"
+              className={`birthday-select ${errors.birthday ? 'input-error' : ''}`}
             >
               <option value="" disabled>Date ▼</option>
               {Array.from({length: 31}, (_, i) => i + 1).map(date => (
-                <option key={date} value={date}>{date}</option>
+                <option key={date} value={String(date).padStart(2, '0')}>{date}</option>
               ))}
             </select>
           </div>
+          {errors.birthday && <span className="error-message">{errors.birthday}</span>}
         </div>
 
         {/* Contact Information */}
@@ -124,9 +170,9 @@ export default function AddCustomerPage() {
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({...formData, email: e.target.value})}
-              className="contact-input"
-              required
+              className={`contact-input ${errors.email ? 'input-error' : ''}`}
             />
+            {errors.email && <span className="error-message">{errors.email}</span>}
           </div>
           
           <div className="contact-field">
@@ -135,9 +181,9 @@ export default function AddCustomerPage() {
               type="tel"
               value={formData.phone}
               onChange={(e) => setFormData({...formData, phone: e.target.value})}
-              className="contact-input"
-              required
+              className={`contact-input ${errors.phone ? 'input-error' : ''}`}
             />
+            {errors.phone && <span className="error-message">{errors.phone}</span>}
           </div>
         </div>
 
@@ -167,30 +213,52 @@ export default function AddCustomerPage() {
 
         {/* Picture Upload */}
         <div className="picture-upload-section">
-          <div className="plus-icon-container">
-            <div className="plus-icon-outer">
-              <div className="plus-icon-inner"></div>
+          {formData.pictureUrl ? (
+            <div className="picture-preview">
+              <img src={formData.pictureUrl} alt="Customer" className="preview-image" />
+              <button 
+                type="button" 
+                onClick={removePicture}
+                className="remove-picture-btn"
+              >
+                Remove
+              </button>
             </div>
-            <span className="picture-upload-text">Add Customer Picture</span>
-          </div>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="file-input"
-          />
+          ) : (
+            <>
+              <div className="plus-icon-container" onClick={triggerFileInput}>
+                <div className="plus-icon-outer">
+                  <div className="plus-icon-inner"></div>
+                </div>
+                <span className="picture-upload-text">Add Customer Picture</span>
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="file-input"
+                ref={fileInputRef}
+              />
+            </>
+          )}
         </div>
 
         {/* Buttons */}
         <div className="action-buttons">
-          <button type="button" className="add-customer-btn">
-            Add Customer
+          <button 
+            type="submit" 
+            className="done-btn"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Saving...' : 'Save Customer'}
           </button>
-          <button type="submit" className="done-btn">
-            Done
-          </button>
-          <button type="button" className="remove-btn">
-            Remove
+          <button 
+            type="button" 
+            onClick={() => router.push('/customers')}
+            className="cancel-btn"
+            disabled={isSubmitting}
+          >
+            Cancel
           </button>
         </div>
       </form>
