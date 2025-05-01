@@ -1,156 +1,198 @@
 'use client';
-import { addDoc, collection } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { addDoc, collection } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import './styles.css';
 
 export default function AddCustomerPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    name: '',
-    gender: 'Male',
-    birthday: '',
+    fullName: '',
+    gender: '',
+    birthYear: '',
+    birthMonth: '',
+    birthDate: '',
     email: '',
     phone: '',
     nic: '',
-    points: 0
+    points: '',
+    picture: null as File | null
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await addDoc(collection(db, 'customers'), formData);
+      await addDoc(collection(db, 'customers'), {
+        fullName: formData.fullName,
+        gender: formData.gender,
+        birthday: `${formData.birthYear}-${formData.birthMonth}-${formData.birthDate}`,
+        email: formData.email,
+        phone: formData.phone,
+        nic: formData.nic,
+        points: Number(formData.points),
+        createdAt: new Date()
+      });
       router.push('/customers');
     } catch (error) {
       console.error('Error adding customer:', error);
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFormData({...formData, picture: e.target.files[0]});
+    }
+  };
+
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">Add Customer</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="name" className="block mb-2">Full Name</label>
+    <div className="customer-add-container">
+      <h1 className="page-title">Add Customer</h1>
+      
+      <form onSubmit={handleSubmit}>
+        {/* Full Name */}
+        <div className="form-section">
+          <label className="section-label">Full Name</label>
           <input
-            id="name"
             type="text"
-            value={formData.name}
-            onChange={(e) => setFormData({...formData, name: e.target.value})}
-            className="w-full p-2 border rounded"
-            placeholder="Enter full name"
+            value={formData.fullName}
+            onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+            className="full-name-input"
             required
           />
         </div>
 
-        <div>
-          <label htmlFor="gender" className="block mb-2">Gender</label>
+        {/* Gender */}
+        <div className="form-section gender-section">
+          <label className="section-label">Gender</label>
           <select
-            id="gender"
             value={formData.gender}
             onChange={(e) => setFormData({...formData, gender: e.target.value})}
-            className="w-full p-2 border rounded"
+            className="gender-select"
           >
+            <option value="" disabled>Gender ▼</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
+            <option value="Other">Other</option>
           </select>
         </div>
 
-        <div>
-          <label className="block mb-2">Birthday</label>
-          <div className="flex space-x-2">
+        {/* Birthday */}
+        <div className="form-section">
+          <label className="section-label">Birthday</label>
+          <div className="birthday-fields">
+            <select
+              value={formData.birthYear}
+              onChange={(e) => setFormData({...formData, birthYear: e.target.value})}
+              className="birthday-select"
+            >
+              <option value="" disabled>Year ▼</option>
+              {Array.from({length: 100}, (_, i) => new Date().getFullYear() - i).map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+            
+            <select
+              value={formData.birthMonth}
+              onChange={(e) => setFormData({...formData, birthMonth: e.target.value})}
+              className="birthday-select"
+            >
+              <option value="" disabled>Month ▼</option>
+              {Array.from({length: 12}, (_, i) => i + 1).map(month => (
+                <option key={month} value={month}>{month}</option>
+              ))}
+            </select>
+            
+            <select
+              value={formData.birthDate}
+              onChange={(e) => setFormData({...formData, birthDate: e.target.value})}
+              className="birthday-select"
+            >
+              <option value="" disabled>Date ▼</option>
+              {Array.from({length: 31}, (_, i) => i + 1).map(date => (
+                <option key={date} value={date}>{date}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Contact Information */}
+        <div className="contact-section">
+          <div className="contact-field">
+            <label className="section-label">Email address</label>
             <input
-              type="number"
-              placeholder="Year"
-              className="w-1/3 p-2 border rounded"
-              onChange={(e) => setFormData({...formData, birthday: `${e.target.value}-${formData.birthday.split('-')[1] || ''}-${formData.birthday.split('-')[2] || ''}`})}
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              className="contact-input"
+              required
             />
+          </div>
+          
+          <div className="contact-field">
+            <label className="section-label">Phone number</label>
             <input
-              type="number"
-              placeholder="Month"
-              className="w-1/3 p-2 border rounded"
-              onChange={(e) => setFormData({...formData, birthday: `${formData.birthday.split('-')[0] || ''}-${e.target.value}-${formData.birthday.split('-')[2] || ''}`})}
-            />
-            <input
-              type="number"
-              placeholder="Date"
-              className="w-1/3 p-2 border rounded"
-              onChange={(e) => setFormData({...formData, birthday: `${formData.birthday.split('-')[0] || ''}-${formData.birthday.split('-')[1] || ''}-${e.target.value}`})}
+              type="tel"
+              value={formData.phone}
+              onChange={(e) => setFormData({...formData, phone: e.target.value})}
+              className="contact-input"
+              required
             />
           </div>
         </div>
 
-        <div>
-          <label htmlFor="email" className="block mb-2">Email address</label>
+        {/* NIC and Points */}
+        <div className="nic-points-section">
+          <div className="nic-field">
+            <label className="section-label">NIC number</label>
+            <input
+              type="text"
+              value={formData.nic}
+              onChange={(e) => setFormData({...formData, nic: e.target.value})}
+              className="nic-input"
+            />
+          </div>
+          
+          <div className="points-field">
+            <label className="section-label">TOP-UP points</label>
+            <input
+              type="number"
+              value={formData.points}
+              onChange={(e) => setFormData({...formData, points: e.target.value})}
+              className="points-input"
+              min="0"
+            />
+          </div>
+        </div>
+
+        {/* Picture Upload */}
+        <div className="picture-upload-section">
+          <div className="plus-icon-container">
+            <div className="plus-icon-outer">
+              <div className="plus-icon-inner"></div>
+            </div>
+            <span className="picture-upload-text">Add Customer Picture</span>
+          </div>
           <input
-            id="email"
-            type="email"
-            value={formData.email}
-            onChange={(e) => setFormData({...formData, email: e.target.value})}
-            className="w-full p-2 border rounded"
-            placeholder="Enter email address"
-            required
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="file-input"
           />
         </div>
 
-        <div>
-          <label htmlFor="phone" className="block mb-2">Phone number</label>
-          <input
-            id="phone"
-            type="tel"
-            value={formData.phone}
-            onChange={(e) => setFormData({...formData, phone: e.target.value})}
-            className="w-full p-2 border rounded"
-            placeholder="Enter phone number"
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="nic" className="block mb-2">NIC number</label>
-          <input
-            id="nic"
-            type="text"
-            value={formData.nic}
-            onChange={(e) => setFormData({...formData, nic: e.target.value})}
-            className="w-full p-2 border rounded"
-            placeholder="Enter NIC number"
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="points" className="block mb-2">TOP-UP points</label>
-          <input
-            id="points"
-            type="number"
-            value={formData.points}
-            onChange={(e) => setFormData({...formData, points: parseInt(e.target.value)})}
-            className="w-full p-2 border rounded"
-            placeholder="Enter TOP-UP points"
-          />
-        </div>
-
-        <div className="flex space-x-4">
-          <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">
+        {/* Buttons */}
+        <div className="action-buttons">
+          <button type="button" className="add-customer-btn">
+            Add Customer
+          </button>
+          <button type="submit" className="done-btn">
             Done
           </button>
-          <button type="button" onClick={() => router.push('/customers')} className="bg-red-500 text-white px-4 py-2 rounded">
+          <button type="button" className="remove-btn">
             Remove
           </button>
         </div>
-
-        <div>
-          <label className="block mb-2">Add Customer Picture</label>
-          <button type="button" className="flex items-center space-x-2">
-            <span className="text-xl">+</span>
-            <span>Add Customer Picture</span>
-          </button>
-        </div>
-
-        <button type="submit" className="bg-gray-500 text-white px-4 py-2 rounded">
-          Add Customer
-        </button>
       </form>
     </div>
   );
