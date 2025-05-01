@@ -87,7 +87,6 @@ export default function AddCustomerPage() {
     }
   };
 
-  const triggerFileInput = () => fileInputRef.current?.click();
   const removePicture = () => setFormData({...formData, pictureUrl: ''});
 
   return (
@@ -95,9 +94,155 @@ export default function AddCustomerPage() {
       <h1 className="page-title">Add Customer</h1>
       
       <form onSubmit={handleSubmit}>
-        {/* Form fields remain the same until picture upload section */}
+        {/* Full Name */}
+        <div className="form-section">
+          <label className="section-label">Full Name</label>
+          <input
+            type="text"
+            value={formData.fullName}
+            onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+            className={`full-name-input ${errors.fullName ? 'input-error' : ''}`}
+            required
+            aria-required="true"
+            placeholder="Enter full name"
+            title="Full Name"
+          />
+          {errors.fullName && <span className="error-message">{errors.fullName}</span>}
+        </div>
 
-        {/* Updated Picture Upload Section with Next.js Image */}
+        {/* Gender */}
+        <div className="form-section gender-section">
+          <label className="section-label">Gender</label>
+          <label htmlFor="gender-select" className="visually-hidden">Gender</label>
+          <select
+            id="gender-select"
+            value={formData.gender}
+            onChange={(e) => setFormData({...formData, gender: e.target.value})}
+            className={`gender-select ${errors.gender ? 'input-error' : ''}`}
+            required
+            aria-required="true"
+          >
+            <option value="" disabled>Gender ▼</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+          {errors.gender && <span className="error-message">{errors.gender}</span>}
+        </div>
+
+        {/* Birthday */}
+        <div className="form-section">
+          <label className="section-label">Birthday</label>
+          <div className="birthday-fields">
+            <label htmlFor="birthYear-select" className="visually-hidden">Birth Year</label>
+            <select
+              id="birthYear-select"
+              value={formData.birthYear}
+              onChange={(e) => setFormData({...formData, birthYear: e.target.value})}
+              className={`birthday-select ${errors.birthday ? 'input-error' : ''}`}
+              required
+              aria-required="true"
+            >
+              <option value="" disabled>Year ▼</option>
+              {Array.from({length: 100}, (_, i) => new Date().getFullYear() - i).map(year => (
+                <option key={year} value={String(year).padStart(2, '0')}>{year}</option>
+              ))}
+            </select>
+            
+            <select
+              title="Birth Month"
+              value={formData.birthMonth}
+              onChange={(e) => setFormData({...formData, birthMonth: e.target.value})}
+              className={`birthday-select ${errors.birthday ? 'input-error' : ''}`}
+              required
+              aria-required="true"
+            >
+              <option value="" disabled>Month ▼</option>
+              {Array.from({length: 12}, (_, i) => i + 1).map(month => (
+                <option key={month} value={String(month).padStart(2, '0')}>{month}</option>
+              ))}
+            </select>
+            
+            <select
+              title="Birth Date"
+              value={formData.birthDate}
+              onChange={(e) => setFormData({...formData, birthDate: e.target.value})}
+              className={`birthday-select ${errors.birthday ? 'input-error' : ''}`}
+              required
+              aria-required="true"
+            >
+              <option value="" disabled>Date ▼</option>
+              {Array.from({length: 31}, (_, i) => i + 1).map(date => (
+                <option key={date} value={String(date).padStart(2, '0')}>{date}</option>
+              ))}
+            </select>
+          </div>
+          {errors.birthday && <span className="error-message">{errors.birthday}</span>}
+        </div>
+
+        {/* Contact Information */}
+        <div className="contact-section">
+          <div className="contact-field">
+            <label className="section-label">Email address</label>
+            <input
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              className={`contact-input ${errors.email ? 'input-error' : ''}`}
+              required
+              aria-required="true"
+              placeholder="Enter email address"
+              title="Email Address"
+            />
+            {errors.email && <span className="error-message">{errors.email}</span>}
+          </div>
+          
+          <div className="contact-field">
+            <label className="section-label">Phone number</label>
+            <input
+              type="tel"
+              value={formData.phone}
+              onChange={(e) => setFormData({...formData, phone: e.target.value})}
+              className={`contact-input ${errors.phone ? 'input-error' : ''}`}
+              required
+              aria-required="true"
+              placeholder="Enter phone number"
+              title="Phone Number"
+            />
+            {errors.phone && <span className="error-message">{errors.phone}</span>}
+          </div>
+        </div>
+
+        {/* NIC and Points */}
+        <div className="nic-points-section">
+          <div className="nic-field">
+            <label className="section-label">NIC number</label>
+            <input
+              type="text"
+              value={formData.nic}
+              onChange={(e) => setFormData({...formData, nic: e.target.value})}
+              className="nic-input"
+              placeholder="Enter NIC number"
+              title="NIC Number"
+            />
+          </div>
+          
+          <div className="points-field">
+            <label className="section-label">TOP-UP points</label>
+            <input
+  type="file"
+  id="customer-picture-upload"
+  accept="image/*"
+  onChange={handleFileChange}
+  className="file-input"
+  ref={fileInputRef}
+  aria-labelledby="picture-upload-label"
+  title="Upload customer photo"
+/>
+          </div>
+        </div>
+
+        {/* Picture Upload */}
         <div className="picture-upload-section">
           {formData.pictureUrl ? (
             <div className="picture-preview">
@@ -108,39 +253,65 @@ export default function AddCustomerPage() {
                   width={100}
                   height={100}
                   className="preview-image"
-                  onError={(e) => {
-                    e.currentTarget.src = '/default-avatar.png';
-                  }}
                 />
               </div>
               <button 
                 type="button" 
                 onClick={removePicture}
                 className="remove-picture-btn"
+                aria-label="Remove customer picture"
               >
                 Remove
               </button>
             </div>
           ) : (
-            <>
-              <div className="plus-icon-container" onClick={triggerFileInput}>
-                <div className="plus-icon-outer">
-                  <div className="plus-icon-inner"></div>
-                </div>
-                <span className="picture-upload-text">Add Customer Picture</span>
-              </div>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="file-input"
-                ref={fileInputRef}
-              />
-            </>
-          )}
+          <>
+      <label 
+        htmlFor="customer-picture-upload" 
+        className="picture-upload-label"
+        id="picture-upload-label"
+      >
+        <div className="plus-icon-container">
+          <div className="plus-icon-outer">
+            <div className="plus-icon-inner"></div>
+          </div>
+          <span className="picture-upload-text">Add Customer Picture</span>
         </div>
+        <span className="visually-hidden">Upload customer photo</span>
+      </label>
+      <input
+        type="file"
+        id="customer-picture-upload"
+        accept="image/*"
+        onChange={handleFileChange}
+        className="file-input"
+        ref={fileInputRef}
+        aria-labelledby="picture-upload-label"
+        title="Upload customer photo"
+      />
+    </>
+  )}
+</div>
 
-        {/* Buttons remain the same */}
+        {/* Buttons */}
+        <div className="action-buttons">
+        <button 
+  type="submit" 
+  className="done-btn"
+  disabled={isSubmitting}
+  {...(isSubmitting ? {'aria-busy': 'true'} : {})}
+>
+  {isSubmitting ? 'Saving...' : 'Save Customer'}
+</button>
+          <button 
+            type="button" 
+            onClick={() => router.push('/customers')}
+            className="cancel-btn"
+            disabled={isSubmitting}
+          >
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
   );

@@ -50,6 +50,17 @@
     font-size: 14px;
   }
   
+  .input-error {
+    border-color: #FF0000 !important;
+  }
+  
+  .error-message {
+    color: #FF0000;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+  }
+  
   .gender-select {
     appearance: none;
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -109,11 +120,15 @@
     margin: 40px 0;
   }
   
+  .picture-upload-label {
+    cursor: pointer;
+    display: inline-block;
+  }
+  
   .plus-icon-container {
     display: flex;
     align-items: center;
     gap: 8px;
-    cursor: pointer;
   }
   
   .plus-icon-outer {
@@ -142,7 +157,10 @@
   }
   
   .file-input {
-    display: none;
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
   }
   
   .picture-preview {
@@ -151,9 +169,13 @@
     gap: 10px;
   }
   
-  .preview-image {
+  .image-wrapper {
+    position: relative;
     width: 100px;
     height: 100px;
+  }
+  
+  .preview-image {
     object-fit: cover;
     border-radius: 4px;
     border: 1px solid #A7A7A7;
@@ -205,14 +227,34 @@
     cursor: not-allowed;
   }
   
-  /* Error Styling */
-  .input-error {
-    border-color: #FF0000 !important;
+  [aria-busy="true"] {
+    position: relative;
+  }
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
   }
   
-  .error-message {
-    color: #FF0000;
-    font-size: 12px;
-    margin-top: 4px;
-    display: block;
+  [aria-busy="true"]::after {
+    content: "";
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin-left: 0.5em;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    border-right-color: transparent;
+    animation: spin 1s linear infinite;
+    vertical-align: middle;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
   }
