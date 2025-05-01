@@ -35,13 +35,13 @@ export default function AddCustomerPage() {
         <div>
   <label htmlFor="name" className="block mb-2">Full Name</label>
   <input
-    id="name"
+    id="username"
     type="text"
     value={formData.name}
     onChange={(e) => setFormData({...formData, name: e.target.value})}
     className="w-full p-2 border rounded"
-    placeholder="Customer full name"
-    aria-label="Customer full name"
+    placeholder="Enter username"
+    aria-label="Username input"
     required
   />
 </div>
