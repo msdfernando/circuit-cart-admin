@@ -27,6 +27,7 @@ export default function LoginPage() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             className="w-full p-2 border rounded"
+            placeholder="Enter your username"
           />
         </div>
         <div className="mb-6">
@@ -36,6 +37,7 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full p-2 border rounded"
+            title="Enter your password"
           />
         </div>
         <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
