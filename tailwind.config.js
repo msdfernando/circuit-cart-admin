@@ -1,7 +1,10 @@
 module.exports = {
-    content: [
-      "./src/**/*.{js,jsx,ts,tsx}",
-      // ... other paths
-    ],
-    // ... rest of your config
-  }
+  content: [
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
