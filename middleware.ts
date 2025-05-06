@@ -11,7 +11,7 @@ export async function middleware(request: Request) {
 
   // Protect admin routes
   if (url.pathname.startsWith('/(admin)')) {
-    const session = await auth.authStateReady();
+    await auth.authStateReady();
     if (!auth.currentUser) {
       return NextResponse.redirect(new URL('/login', url.origin));
     }
