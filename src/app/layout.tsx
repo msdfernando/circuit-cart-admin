@@ -1,9 +1,6 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
 import AuthProvider from '@/context/AuthProvider';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Circuit Cart Admin',
@@ -19,7 +16,6 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AuthProvider>
-          {/* No sidebar here - it's in (admin) layout */}
           {children}
         </AuthProvider>
       </body>
