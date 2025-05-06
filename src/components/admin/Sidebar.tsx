@@ -1,7 +1,12 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { HomeIcon, UsersIcon, ShoppingCartIcon, CogIcon } from '@heroicons/react/24/outline';
+import { 
+  HomeIcon, 
+  UsersIcon, 
+  ShoppingCartIcon, 
+  CogIcon 
+} from '@heroicons/react/24/outline';
 
 export default function Sidebar() {
   const pathname = usePathname();
