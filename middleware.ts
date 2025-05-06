@@ -4,7 +4,12 @@ import { auth } from '@/config/firebase';
 export async function middleware(request: Request) {
   const pathname = new URL(request.url).pathname;
 
-  // Protect all admin routes
+  // Redirect /dashboard to /(admin)/dashboard
+  if (pathname === '/dashboard') {
+    return NextResponse.redirect(new URL('/(admin)/dashboard', request.url));
+  }
+
+  // Protect admin routes
   if (pathname.startsWith('/(admin)')) {
     const user = auth.currentUser;
     if (!user) {
@@ -16,5 +21,5 @@ export async function middleware(request: Request) {
 }
 
 export const config = {
-  matcher: ['/(admin)/:path*'],
+  matcher: ['/dashboard', '/(admin)/:path*'],
 };
