@@ -7,11 +7,14 @@ export default async function AdminLayout({
   children: React.ReactNode
 }) {
   await checkAdminAccess();
+  
   return (
-    <div className="flex">
+    <div className="flex h-screen">
       <Sidebar />
-      <div className="flex-1">
-        {children}
+      <div className="flex-1 overflow-auto">
+        <main className="p-6">
+          {children}
+        </main>
       </div>
     </div>
   );

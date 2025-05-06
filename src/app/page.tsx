@@ -6,8 +6,9 @@ export default function Home() {
       <div className="bg-white p-8 rounded-lg shadow-md text-center">
         <h1 className="text-3xl font-bold mb-4">Welcome to Circuit Cart</h1>
         <Link 
-          href="/dashboard"  // Changed from "/(admin)/dashboard"
+          href="/dashboard" 
           className="inline-block bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition"
+          prefetch={false}  // Important to prevent redirect errors
         >
           Go to Admin Panel
         </Link>

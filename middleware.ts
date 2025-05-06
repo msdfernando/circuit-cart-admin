@@ -2,18 +2,18 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/config/firebase';
 
 export async function middleware(request: Request) {
-  const pathname = new URL(request.url).pathname;
-
-  // Redirect /dashboard to /(admin)/dashboard
-  if (pathname === '/dashboard') {
-    return NextResponse.redirect(new URL('/(admin)/dashboard', request.url));
+  const url = new URL(request.url);
+  
+  // Handle /dashboard redirect
+  if (url.pathname === '/dashboard') {
+    return NextResponse.redirect(new URL('/(admin)/dashboard', url.origin));
   }
 
   // Protect admin routes
-  if (pathname.startsWith('/(admin)')) {
-    const user = auth.currentUser;
-    if (!user) {
-      return NextResponse.redirect(new URL('/login', request.url));
+  if (url.pathname.startsWith('/(admin)')) {
+    const session = await auth.authStateReady();
+    if (!auth.currentUser) {
+      return NextResponse.redirect(new URL('/login', url.origin));
     }
   }
 
