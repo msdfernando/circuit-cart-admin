@@ -6,15 +6,12 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  await checkAdminAccess(); // This will redirect if not authenticated
-  
+  await checkAdminAccess();
   return (
-    <div className="flex h-screen">
+    <div className="flex">
       <Sidebar />
-      <div className="flex-1 overflow-auto">
-        <main className="p-6">
-          {children}
-        </main>
+      <div className="flex-1">
+        {children}
       </div>
     </div>
   );

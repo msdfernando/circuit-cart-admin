@@ -12,10 +12,9 @@ export default function Sidebar() {
   const pathname = usePathname();
   
   const navItems = [
-    { name: 'Dashboard', href: '/(admin)/dashboard', icon: HomeIcon },
-    { name: 'Customers', href: '/(admin)/customers', icon: UsersIcon },
-    { name: 'Transactions', href: '/(admin)/transactions', icon: ShoppingCartIcon },
-    { name: 'Settings', href: '/settings', icon: CogIcon },
+    { name: 'Dashboard', href: '/(admin)/dashboard' },
+    { name: 'Customers', href: '/(admin)/customers' },
+    { name: 'Transactions', href: '/(admin)/transactions' }
   ];
 
   return (

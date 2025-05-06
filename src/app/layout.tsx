@@ -17,11 +17,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body>
         <AuthProvider>
-          <div className="min-h-screen bg-gray-50">
-            {children}
-          </div>
+          {/* No sidebar here - it's in (admin) layout */}
+          {children}
         </AuthProvider>
       </body>
     </html>
