@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { login } from '@/lib/auth'; // Added missing import
 
 export default function LoginForm() {
   const [username, setUsername] = useState('');
@@ -8,9 +9,9 @@ export default function LoginForm() {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => { // Added type for event
     e.preventDefault();
-    if (login(username, password)) { // Use the login function from auth.ts
+    if (login(username, password)) {
       router.push('/(admin)/dashboard');
     } else {
       setError('Invalid credentials');
@@ -25,23 +26,27 @@ export default function LoginForm() {
         </div>
       )}
       <div>
-        <label className="block text-sm font-medium text-gray-700">Username</label>
+        <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
         <input
+          id="username"
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           required
+          aria-label="Username"
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700">Password</label>
+        <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
         <input
+          id="password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           required
+          aria-label="Password"
         />
       </div>
       <button
