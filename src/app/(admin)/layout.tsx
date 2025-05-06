@@ -6,7 +6,7 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  await checkAdminAccess(); // Will redirect if not authenticated
+  await checkAdminAccess(); // This will redirect if not authenticated
   
   return (
     <div className="flex h-screen">
