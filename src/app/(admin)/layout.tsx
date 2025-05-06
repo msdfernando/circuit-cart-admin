@@ -1,13 +1,25 @@
+'use client'; // Add this at the top
+import { useEffect, useState } from 'react';
 import Sidebar from '@/components/admin/Sidebar';
 import { checkAdminAccess } from '@/lib/auth';
 
-export default async function AdminLayout({
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  await checkAdminAccess();
-  
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    checkAdminAccess()
+      .then(() => setIsAuthenticated(true))
+      .catch(() => setIsAuthenticated(false));
+  }, []);
+
+  if (!isAuthenticated) {
+    return null; // Or a loading spinner
+  }
+
   return (
     <div className="flex h-screen">
       <Sidebar />

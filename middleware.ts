@@ -11,8 +11,12 @@ export async function middleware(request: Request) {
 
   // Protect admin routes
   if (url.pathname.startsWith('/(admin)')) {
-    await auth.authStateReady(); // Removed unused session assignment
-    if (!auth.currentUser) {
+    try {
+      await auth.authStateReady();
+      if (!auth.currentUser) {
+        return NextResponse.redirect(new URL('/login', url.origin));
+      }
+    } catch {
       return NextResponse.redirect(new URL('/login', url.origin));
     }
   }
