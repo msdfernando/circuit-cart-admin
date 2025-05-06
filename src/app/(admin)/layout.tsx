@@ -1,6 +1,7 @@
-'use client'; // Add this at the top
+'use client';
 import { useEffect, useState } from 'react';
 import Sidebar from '@/components/admin/Sidebar';
+import { useRouter } from 'next/navigation';
 import { checkAdminAccess } from '@/lib/auth';
 
 export default function AdminLayout({
@@ -8,16 +9,17 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
+  const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    checkAdminAccess()
-      .then(() => setIsAuthenticated(true))
-      .catch(() => setIsAuthenticated(false));
+    if (!checkAdminAccess()) { // Use the check from auth.ts
+      router.push('/login');
+    }
   }, []);
 
   if (!isAuthenticated) {
-    return null; // Or a loading spinner
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
 
   return (
