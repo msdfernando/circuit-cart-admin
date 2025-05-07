@@ -14,7 +14,8 @@ export default function LoginForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (login(username, password)) {
-      router.push('/(admin)/dashboard');
+      // Use absolute path for redirect
+      router.push('/dashboard'); // Changed from '/(admin)/dashboard'
     } else {
       setError('Invalid credentials');
     }

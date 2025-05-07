@@ -1,22 +1,24 @@
 
 
-// src/lib/auth.ts
+// Session storage keys
+// Pure session-based auth - no Firebase
+const ADMIN_CREDENTIALS = {
+  username: 'admin',
+  password: '1234'
+};
 
-export function checkAdminAccess(): boolean {
-  if (typeof window !== 'undefined') {
-    return sessionStorage.getItem('isAuthenticated') === 'true';
-  }
-  return false;
-}
-
-export function login(username: string, password: string): boolean {
-  if (username === 'admin' && password === '1234') {
-    sessionStorage.setItem('isAuthenticated', 'true');
+export const login = (username: string, password: string): boolean => {
+  if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+    sessionStorage.setItem('isAdmin', 'true');
     return true;
   }
   return false;
-}
+};
 
-export function logout(): void {
-  sessionStorage.removeItem('isAuthenticated');
-}
+export const logout = (): void => {
+  sessionStorage.removeItem('isAdmin');
+};
+
+export const isAuthenticated = (): boolean => {
+  return sessionStorage.getItem('isAdmin') === 'true';
+};

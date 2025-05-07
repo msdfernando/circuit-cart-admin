@@ -1,24 +1,19 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/config/firebase';
+import { isAuthenticated } from '@/lib/auth';
 
 export async function middleware(request: Request) {
   const url = new URL(request.url);
-  
-  // Handle /dashboard redirect
+
+  // Redirect /dashboard to admin panel if authenticated
   if (url.pathname === '/dashboard') {
-    return NextResponse.redirect(new URL('/(admin)/dashboard', url.origin));
+    return isAuthenticated()
+      ? NextResponse.redirect(new URL('/(admin)/dashboard', url.origin))
+      : NextResponse.redirect(new URL('/(auth)/login', url.origin));
   }
 
-  // Protect admin routes
-  if (url.pathname.startsWith('/(admin)')) {
-    try {
-      await auth.authStateReady();
-      if (!auth.currentUser) {
-        return NextResponse.redirect(new URL('/login', url.origin));
-      }
-    } catch {
-      return NextResponse.redirect(new URL('/login', url.origin));
-    }
+  // Protect all admin routes
+  if (url.pathname.startsWith('/(admin)') && !isAuthenticated()) {
+    return NextResponse.redirect(new URL('/(auth)/login', url.origin));
   }
 
   return NextResponse.next();
